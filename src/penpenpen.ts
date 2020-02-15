@@ -1,8 +1,3 @@
-const canvas = document.getElementById('canvas') as HTMLCanvasElement
-const ctx = canvas.getContext('2d')
-canvas.setAttribute('width', document.body.clientWidth.toString())
-canvas.setAttribute('height', document.body.clientHeight.toString())
-
 const pen = {
     startX: 0,
     startY: 0,
@@ -10,6 +5,39 @@ const pen = {
     y: 0,
     drawing: false
 }
+
+const DrawHistory: {
+    list: ImageData[],
+    ctx: CanvasRenderingContext2D,
+    width: number,
+    height: number,
+    stack: Function,
+    pop: Function
+} = {
+    list: [],
+    ctx: null,
+    width: 0,
+    height: 0,
+    stack() {
+        const image = this.ctx.getImageData(0, 0, this.width, this.height)
+        this.list.push(image)
+    },
+    pop() {
+        const image = this.list.pop()
+        this.ctx.putImageData(image, 0, 0)
+    }
+}
+
+const canvas = document.getElementById('canvas') as HTMLCanvasElement
+const ctx = canvas.getContext('2d')
+const documentWidth = document.body.clientWidth
+const documentHeight = document.body.clientHeight
+canvas.setAttribute('width', documentWidth.toString())
+canvas.setAttribute('height', documentHeight.toString())
+
+DrawHistory.ctx = ctx
+DrawHistory.width = documentWidth
+DrawHistory.height = documentHeight
 
 document.getElementById('download').addEventListener('click', () => {
     console.log('aa')
@@ -24,9 +52,16 @@ document.addEventListener('keydown', event => {
         return
     }
     if (['f', 'j'].includes(event.key)) {
+        if (!pen.drawing) {
+            DrawHistory.stack()
+        }
         pen.drawing = true
         pen.startX = pen.x
         pen.startY = pen.y
+    }
+    if (event.key === 'z' && (event.ctrlKey || event.metaKey)) {
+        console.log('press z')
+        DrawHistory.pop()
     }
 })
 
