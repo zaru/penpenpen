@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "sourceMap": true,
+    "module": "es2015",
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "target": "es2015",
+    "lib": [
+      "dom",
+      "esnext"
+    ]
+  },
+  "include": [
+    "./src/**/*.ts"
+  ]
+}
